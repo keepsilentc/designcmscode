@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.OrderMapper">
+	<resultMap id="BaseResultMap" type="Order">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="userNo" property="userNo" jdbcType="VARCHAR" />
+		<result column="OrderNo" property="orderNo" jdbcType="VARCHAR" />
+		<result column="PreOrderNo" property="preOrderNo" jdbcType="VARCHAR"/>
+		<result column="OrderType" property="orderType" jdbcType="INTEGER" />
+		<result column="payId" property="payId" jdbcType="VARCHAR" />
+		<result column="CurrencyID" property="currencyId" jdbcType="VARCHAR" />
+		<result column="OrderMoney" property="orderMoney" jdbcType="DECIMAL" />
+		<result column="Freight" property="freight" jdbcType="DECIMAL" />
+		<result column="CouponNo" property="couponNo" jdbcType="VARCHAR" />
+		<result column="DiscountMoney" property="discountMoney" jdbcType="DECIMAL" />
+		<result column="DeliverNo" property="deliverNo" jdbcType="VARCHAR" />
+		<result column="DeliverName" property="deliverName" jdbcType="VARCHAR" />
+		<result column="OrderState" property="orderState" jdbcType="INTEGER" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="isShow" property="isShow" jdbcType="INTEGER" />
+		<result column="Remark" property="remark" jdbcType="VARCHAR" />
+		<result column="ModifyCount" property="modifyCount" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateBy" property="updateBy" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<resultMap id="OrderInfoResultMap" type="OrderInfo" extends="BaseResultMap">
+		<result column="CanSend" property="canSend" jdbcType="INTEGER" />
+		<result column="currencySign" property="currencySign" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<select id="getOrderInfoByOrderNo" resultMap="OrderInfoResultMap">
+		SELECT a.ID,a.userNo,a.OrderNo,a.PreOrderNo,a.isShow,a.OrderType,a.payId,a.CurrencyID,a.OrderMoney,a.Freight,a.CouponNo,a.DiscountMoney,a.DeliverNo,a.DeliverName,a.OrderState,
+		a.address,a.Remark,a.ModifyCount,a.CreateTime,CanSend(a.OrderNo) as CanSend,b.CurrencySign from dn_order a left join dn_currency b on a.CurrencyID = b.ID
+		where a.OrderNo = #{orderNo,jdbcType=VARCHAR}
+	</select>
+	
+	<update id="deliverUpdate" parameterType="Order">
+		UPDATE dn_order
+		<set>
+			ModifyCount = ModifyCount+1,
+			DeliverName = #{deliverName,jdbcType=VARCHAR},
+			DeliverNo = #{deliverNo,jdbcType=VARCHAR},
+			OrderState = #{orderState,jdbcType=INTEGER}
+		</set>
+		where ID = #{id,jdbcType=BIGINT} and OrderState = 21 and ModifyCount = #{modifyCount,jdbcType=INTEGER} 
+	</update>
+	
+	<select id="getCount" parameterType="map" resultType="int">
+		SELECT count(0) from dn_order
+		<where>
+			isShow = 1
+			<if test="userNo!=null">
+				and userNo = #{userNo,jdbcType=VARCHAR}
+			</if>
+			<if test="orderNo!=null">
+				and OrderNo = #{orderNo,jdbcType=VARCHAR}
+			</if>
+			<if test="orderType!=null">
+				and OrderType = #{orderType,jdbcType=INTEGER}
+			</if>
+			<if test="orderState!=null">
+				and OrderState = #{orderState,jdbcType=INTEGER}
+			</if>
+			<if test="startTime!=null">
+				<![CDATA[
+					and CreateTime >= #{startTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+			<if test="endTime!=null">
+				<![CDATA[
+					and CreateTime <= #{endTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+		</where>
+	</select>
+	
+	<select id="getList" parameterType="map" resultMap="OrderInfoResultMap">
+		SELECT a.ID,a.userNo,a.OrderNo,a.PreOrderNo,a.isShow,a.OrderType,a.payId,a.CurrencyID,a.OrderMoney,a.Freight,a.CouponNo,a.DiscountMoney,a.DeliverNo,a.DeliverName,a.OrderState,
+		a.address,a.Remark,a.ModifyCount,a.CreateTime,CanSend(a.OrderNo) as CanSend,b.CurrencySign from dn_order a left join dn_currency b on a.CurrencyID = b.ID
+		<where>
+			a.isShow = 1
+			<if test="userNo!=null">
+				and a.userNo = #{userNo,jdbcType=VARCHAR}
+			</if>
+			<if test="orderNo!=null">
+				and a.OrderNo = #{orderNo,jdbcType=VARCHAR}
+			</if>
+			<if test="orderType!=null">
+				and a.OrderType = #{orderType,jdbcType=INTEGER}
+			</if>
+			<if test="orderState!=null">
+				and a.OrderState = #{orderState,jdbcType=INTEGER}
+			</if>
+			<if test="startTime!=null">
+				<![CDATA[
+					and a.CreateTime >= #{startTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+			<if test="endTime!=null">
+				<![CDATA[
+					and a.CreateTime <= #{endTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+		</where>
+		order by a.CreateTime desc
+		LIMIT #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	</select>
+	
+	
+</mapper> 

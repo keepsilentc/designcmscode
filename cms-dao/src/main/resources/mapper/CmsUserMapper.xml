@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.CmsUserMapper">
+	<resultMap id="BaseResultMap" type="CmsUser">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="userName" property="userName" jdbcType="VARCHAR" />
+		<result column="userPassword" property="userPassword" jdbcType="VARCHAR" />
+		<result column="nickName" property="nickName" jdbcType="VARCHAR" />
+		<result column="realName" property="realName" jdbcType="VARCHAR" />
+		<result column="age" property="age" jdbcType="INTEGER" />
+		<result column="sex" property="sex" jdbcType="INTEGER" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="mobileNo" property="mobileNo" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="qq" property="qq" jdbcType="VARCHAR" />
+		<result column="regTime" property="regTime" jdbcType="TIMESTAMP" />
+		<result column="lastLogintime" property="lastLoginTime" jdbcType="TIMESTAMP" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateBy" property="updateBy" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<resultMap id="CmsUserInfoMap" type="CmsUserInfo" extends="BaseResultMap">
+		<result column="roleNames" property="roleNames" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="getUserByUserName" resultMap="BaseResultMap">
+		SELECT ID,userName,userPassword,nickName,realName,age,sex,address,mobileNo,
+		email,qq,regTime,lastLogintime,status,CreateTime,UpdateBy,UpdateTime from cms_user
+		where userName = #{userName,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getAllUser" parameterType="map" resultMap="CmsUserInfoMap">
+		SELECT a.ID,a.userName,a.userPassword,a.nickName,a.realName,a.age,a.sex,a.address,a.mobileNo,a.email,a.qq,queryRoles(a.ID)AS roleNames,a.regTime,a.lastLogintime,a.STATUS  
+		FROM cms_user a LEFT JOIN cms_user_role b ON a.id = b.user_id LEFT JOIN cms_role c ON c.id = b.role_id 
+		<where>
+			<if test="roleId!=null">
+				c.id = #{roleId,jdbcType=BIGINT}
+			</if>
+			<if test="userName!=null">
+				and userName like CONCAT('%',#{userName,jdbcType=VARCHAR},'%')
+			</if>
+		</where>
+	</select>
+
+	<insert id="insert" parameterType="CmsUser">
+		INSERT INTO cms_user(userName,userPassword,nickName,realName,age,sex,address,mobileNo,email,qq,regTime,status,CreateTime)
+		values(#{userName,jdbcType=VARCHAR},#{userPassword,jdbcType=VARCHAR},#{nickName,jdbcType=VARCHAR},#{realName,jdbcType=VARCHAR},#{age,jdbcType=INTEGER},
+		#{sex,jdbcType=INTEGER},#{address,jdbcType=VARCHAR},#{mobileNo,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR},#{qq,jdbcType=VARCHAR},
+		#{regTime,jdbcType=TIMESTAMP},#{status,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	<update id="update" parameterType="CmsUser">
+		UPDATE cms_user 
+		<set>
+			<if test="userName!=null">
+				userName = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="userPassword!=null">
+				userPassword = #{userPassword,jdbcType=VARCHAR},
+			</if>
+			<if test="nickName!=null">
+				nickName = #{nickName,jdbcType=VARCHAR},
+			</if>
+			<if test="realName!=null">
+				realName = #{realName,jdbcType=VARCHAR},
+			</if>
+			<if test="age!=null">
+				age = #{age,jdbcType=INTEGER},
+			</if>
+			<if test="sex!=null">
+				sex = #{sex,jdbcType=INTEGER},
+			</if>
+			<if test="address!=null">
+				address = #{address,jdbcType=VARCHAR},
+			</if>
+			<if test="mobileNo!=null">
+				mobileNo = #{mobileNo,jdbcType=VARCHAR},
+			</if>
+			<if test="email!=null">
+				email = #{email,jdbcType=VARCHAR},
+			</if>
+			<if test="qq!=null">
+				qq = #{qq,jdbcType=VARCHAR},
+			</if>
+			<if test="regTime!=null">
+				regTime = #{regTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="status!=null">
+				status = #{status,jdbcType=VARCHAR},
+			</if>
+			<if test="updateBy!=null">
+				UpdateBy = #{updateBy,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime!=null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
+	<delete id="del" parameterType="long">
+		delete from cms_user where ID = #{id,jdbcType=BIGINT}
+	</delete>
+
+</mapper> 

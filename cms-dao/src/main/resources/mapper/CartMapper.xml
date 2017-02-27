@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.CartMapper">
+	<resultMap id="BaseResultMap" type="Cart">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="userNo" property="userNo" jdbcType="VARCHAR" />
+		<result column="ProductNo" property="productNo" jdbcType="VARCHAR" />
+		<result column="PtstcID" property="ptscId" jdbcType="BIGINT" />
+		<result column="ProductNum" property="productNum" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<resultMap id="CartInfoMap" type="CartInfo" extends="BaseResultMap">
+		<result column="SizeName" property="sizeName" jdbcType="VARCHAR" />
+		<result column="ColorName" property="colorName" jdbcType="VARCHAR" />
+		<result column="Picture" property="picture" jdbcType="BIGINT" />
+		<result column="Inventory" property="inventory" jdbcType="INTEGER" />
+		<result column="IsEnable" property="isEnable" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<insert id="insertProducttoCart" parameterType="Cart" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO dn_cart(userNo,ProductNo,PtstcID,ProductNum)
+		values(#{userNo,jdbcType=VARCHAR},#{productNo,jdbcType=VARCHAR},
+		#{ptscId,jdbcType=BIGINT},#{productNum,jdbcType=VARCHAR})
+	</insert>
+	
+	<select id="getCartById" parameterType="long" resultMap="BaseResultMap">
+		SELECT ID,userNo,ProductNo,PtstcID,ProductNum from dn_cart where id = #{id,jdbcType=BIGINT}
+	</select>
+		
+	<select id="getProductByCondition" parameterType="map" resultMap="BaseResultMap">
+		SELECT ID,userNo,ProductNo,PtstcID,ProductNum from dn_cart
+		where userNo = #{userNo,jdbcType=VARCHAR} and ProductNo = #{productNo,jdbcType=VARCHAR} and PtstcID = #{ptscId,jdbcType=BIGINT}
+	</select>
+	
+	<select id="getAllProductsByUserNo" parameterType="string" resultMap="CartInfoMap">
+		SELECT a.ID,a.userNo,a.ProductNo,a.PtstcID,a.ProductNum,b.Picture,b.Inventory,b.IsEnable,c.SizeName,d.name as ColorName
+		FROM dn_cart a
+		LEFT JOIN dn_product_size_color b ON a.PtstcID = b.ID
+		LEFT JOIN dn_size c ON c.ID = b.SizeID
+		LEFT JOIN dn_color d ON d.ID = b.ColorID
+		WHERE a.userNo = #{userNo,jdbcType=VARCHAR} 
+	</select>
+	
+	<update id="updateProductinCart" parameterType="Cart">
+		UPDATE dn_cart
+		<set>
+			<if test="productNum!=null">
+				ProductNum = #{productNum,jdbcType=INTEGER}
+			</if>
+		</set>
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<delete id="removeProductfromCart">
+		DELETE from dn_cart where ID = #{id,jdbcType=BIGINT} and userNo = #{userNo,jdbcType=VARCHAR}
+	</delete>
+	
+	<delete id="batchRmProductsInCart">
+		DELETE from dn_cart where userNo = #{userNo,jdbcType=VARCHAR} and ID in 
+		<foreach collection="ids" open="(" close=")" separator="," item="item">
+			#{item,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<resultMap id="NumAndMoneyMap" type="NumAndMoney">
+		<result column="Num" property="num" jdbcType="BIGINT" />
+		<result column="Money" property="money" jdbcType="DECIMAL" />
+	</resultMap>
+	
+	<select id="getCartSumNumAndMoney" parameterType="string" resultMap="NumAndMoneyMap">
+		SELECT SUM(a.ProductNum) as Num,SUM(a.ProductNum*b.Price) as Money FROM dn_cart a
+		LEFT JOIN dn_product b ON a.ProductNo = b.ProductNo
+		AND a.userNo = #{userNo,jdbcType=VARCHAR}
+	</select>
+</mapper> 

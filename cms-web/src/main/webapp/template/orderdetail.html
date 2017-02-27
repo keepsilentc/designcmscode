@@ -1,0 +1,125 @@
+<div class="row" ng-cloak>
+	<div class="col-xs-12">
+		<div class="panel panel-default">
+			  <div class="panel-heading">
+			    <h3 class="panel-title">收货地址</h3>
+			  </div>
+			  <div class="panel-body">
+			    	<div class="col-xs-12" style="padding:5px 10px">
+		    			<div class="col-xs-6">
+		    				收件人: {{address.recipients}}
+		    			</div>
+		    			<div class="col-xs-6">
+		    				手机号: {{address.mobileNo}}
+		    			</div>
+		    			<div class="col-xs-6 bottom">
+		    				邮编: {{address.postCode}}
+		    			</div>
+		    			<div class="col-xs-6 bottom" ng-if="address.email">
+		    				邮箱: {{address.email}}
+		    			</div>
+		    			<div class="col-xs-12 bottom">
+		    				地址: <span ng-if="address.country=='中国'">{{address.country}}&nbsp;|&nbsp;{{address.province}}&nbsp;|&nbsp;{{address.city}}&nbsp;|&nbsp;{{address.region}}&nbsp;|&nbsp;{{address.addressInfo}}</span>
+		    				<span ng-if="address.country!='中国'">{{address.country}}&nbsp;|&nbsp;{{address.town}}&nbsp;|&nbsp;{{address.district}}&nbsp;|&nbsp;{{address.addressInfo}}</span>
+		    			</div>
+			    	</div>
+			  </div>
+		</div>
+	</div>
+	<div class="col-xs-12" ng-if="orderInfo.deliverNo&&orderInfo.deliverName">
+		<div class="panel panel-default">
+			  <div class="panel-heading">
+			    <h3 class="panel-title">配送方式</h3>
+			  </div>
+			  <div class="panel-body">
+			    	<div class="col-xs-12">
+			    		<p>
+			    			<font class="pull-left">{{orderInfo.deliverName}}</font>
+			    			<font class="pull-right">{{orderInfo.deliverNo}}</font>
+			    		</p>
+			    	</div>
+			  </div>
+		</div>
+	</div>
+	<div class="col-xs-12" ng-if="orderInfo.payId">
+		<div class="panel panel-default">
+			  <div class="panel-heading">
+			    <h3 class="panel-title">支付方式</h3>
+			  </div>
+			  <div class="panel-body">
+			    	<div class="col-xs-12">
+			    		<p>
+			    			<font >{{orderInfo.payId}}</font>
+			    		</p>
+			    	</div>
+			  </div>
+		</div>
+	</div>
+	<div class="col-xs-12">
+		<div class="panel panel-default">
+			  <div class="panel-heading">
+			    <h3 class="panel-title">商品详情</h3>
+			  </div>
+			  <div class="panel-body">
+			    	<div class="col-xs-12" ng-repeat="item in orderInfo.orderDetails" style="margin:5px 0px;padding:10px 0px;border:1px solid #ccc">
+			    		<div class="col-xs-3">
+			    			<img ng-src="{{ctx}}/file/get.do?id={{item.picture}}" alt="..." class="img-thumbnail imgin">
+			    		</div>
+			    		
+			    		<div class="col-xs-9" style="padding:10px 0px;">
+			    			<div class="col-xs-6">
+			    				商品编号：{{item.productNo}}
+			    			</div>
+			    			<div class="col-xs-6">
+			    				商品状态：<font ng-if="item.productState==10">现货</font>
+			    						<font ng-if="item.productState==20">预售</font>
+			    			</div>
+			    			<div class="col-xs-6 bottom">
+			    				颜色：{{item.colorName}}
+			    			</div>
+			    			<div class="col-xs-6 bottom">
+			    				尺码：{{item.sizeName}}
+			    			</div>
+			    			<div class="col-xs-6 bottom">
+			    				购买个数：{{item.ptBuyNum}}
+			    			</div>
+			    			<div class="col-xs-6 bottom">
+			    				总价：{{item.ptsumMoney|currency:orderInfo.currencySign}}
+			    			</div>
+			    			<div class="col-xs-6 bottom">
+			    				状态：   <font ng-if="item.orderDetailState==10">退款中</font>
+			    					<font ng-if="item.orderDetailState==20">退款成功</font>
+			    					<font ng-if="item.orderDetailState==40">退款失败</font>
+			    					<font ng-if="item.orderDetailState==50">关闭</font>
+			    					<font ng-if="item.orderDetailState==11">换货中</font>
+			    					<font ng-if="item.orderDetailState==21">换货成功</font>
+			    					<font ng-if="item.orderDetailState==41">换货失败</font>
+			    					<font ng-if="item.orderDetailState==12">退货中</font>
+			    					<font ng-if="item.orderDetailState==22">退货成功</font>
+			    					<font ng-if="item.orderDetailState==42">退货失败</font>
+			    			</div>
+			    		</div>
+			    	</div>
+			    	<div class="col-xs-12">
+			    			备注：{{orderInfo.remark}}
+			    	</div>
+		    		<div class="col-xs-12 bottom">
+		    			<span class="pull-left">商品总额：</span>
+		    			<span class="pull-right"><s>{{orderInfo.orderDetails|sumOfItems:'ptsumMoney'|currency:orderInfo.currencySign}}</s></span>
+		    		</div>
+		    		<div class="col-xs-12 bottom">
+		    			<span class="pull-left">运费：</span>
+		    			<span class="pull-right">+{{orderInfo.freight|currency:orderInfo.currencySign}}</span>
+		    		</div>
+		    		<div class="col-xs-12 bottom">
+		    			<span class="pull-left">折扣：</span>
+		    			<span class="pull-right">-{{orderInfo.discountMoney|currency:orderInfo.currencySign}}</span>
+		    		</div>
+		    		<div class="col-xs-12 bottom red">
+		    			<span class="pull-left">实付金额：</span>
+		    			<span class="pull-right">{{orderInfo.orderMoney|currency:orderInfo.currencySign}}</span>
+		    		</div>
+			  </div>
+		</div>
+	</div>
+</div>

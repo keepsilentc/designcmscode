@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.CouponMapper">
+	<resultMap id="BaseResultMap" type="Coupon">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="CouponNo" property="couponNo" jdbcType="VARCHAR" />
+		<result column="CouponName" property="couponName" jdbcType="VARCHAR" />
+		<result column="CouponStrategy" property="couponStrategy" jdbcType="INTEGER" />
+		<result column="CouponType" property="couponType" jdbcType="INTEGER" />
+		<result column="StartTime" property="startTime" jdbcType="TIMESTAMP" />
+		<result column="EndTime" property="endTime" jdbcType="TIMESTAMP" />
+		<result column="SumNum" property="sumNum" jdbcType="INTEGER" />
+		<result column="CouponRate" property="couponRate" jdbcType="DECIMAL" />
+		<result column="FullMoney" property="fullMoney" jdbcType="DECIMAL" />
+		<result column="MinusMoney" property="minusMoney" jdbcType="DECIMAL" />
+		<result column="IsEnable" property="isEnable" jdbcType="INTEGER" />
+		<result column="Remark" property="remark" jdbcType="VARCHAR" />
+		<result column="UpdateBy" property="updateBy" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<resultMap id="CouponInfoMap" type="CouponInfo">
+		<result column="RemainNum" property="remainNum" jdbcType="BIGINT" />
+	</resultMap>
+	
+	<select id="getCount" parameterType="map" resultType="int">
+		SELECT count(0) from dn_coupon 
+		<where>
+			<if test="couponName!=null">
+				CouponName = like CONCAT('%',#{couponName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="couponType!=null">
+				and CouponType = #{couponType,jdbcType=INTEGER}
+			</if>
+			<if test="couponStrategy!=null">
+				and CouponStrategy = #{couponStrategy,jdbcType=INTEGER}
+			</if>
+			<if test="IsEnable!=null">
+				and IsEnable = #{IsEnable,jdbcType=INTEGER}
+			</if>
+			<if test="startTime!=null">
+				<![CDATA[
+						and StartTime > = #{startTime,jdbcType=TIMESTAMP}
+					]]>
+				
+			</if>
+			<if test="endTime!=null">
+				<![CDATA[
+						and EndTime < = #{endTime,jdbcType=TIMESTAMP}
+					]]>
+			</if>
+		</where>
+	</select>
+	
+	<select id="getList" parameterType="map" resultMap="BaseResultMap">
+		SELECT ID,CouponNo,CouponName,SumNum,CouponType,CouponStrategy,StartTime,EndTime,CouponRate,FullMoney,MinusMoney,
+			IsEnable,Remark  from dn_coupon 
+			<where>
+				<if test="couponName!=null">
+					CouponName = like CONCAT('%',#{couponName,jdbcType=VARCHAR},'%')
+				</if>
+				<if test="couponStrategy!=null">
+					and CouponStrategy = #{couponStrategy,jdbcType=INTEGER}
+				</if>
+				<if test="couponType!=null">
+					and CouponType = #{couponType,jdbcType=INTEGER}
+				</if>
+				<if test="IsEnable!=null">
+					and IsEnable = #{isEnable,jdbcType=INTEGER}
+				</if>
+				<if test="startTime!=null">
+					<![CDATA[
+							and StartTime > = #{startTime,jdbcType=TIMESTAMP}
+						]]>
+					
+				</if>
+				<if test="endTime!=null">
+					<![CDATA[
+							and EndTime < = #{endTime,jdbcType=TIMESTAMP}
+						]]>
+				</if>
+			</where>
+		order by CreateTime desc 
+		limit #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	</select>
+	
+	<insert id="insert" parameterType="Coupon" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO dn_coupon(CouponNo,CouponName,CouponType,CouponStrategy,StartTime,EndTime,SumNum,CouponRate,FullMoney,MinusMoney,Remark,CreateTime)
+		values(#{couponNo,jdbcType=VARCHAR},#{couponName,jdbcType=VARCHAR},#{couponType,jdbcType=INTEGER},#{couponStrategy,jdbcType=INTEGER},#{startTime,jdbcType=TIMESTAMP},#{endTime,jdbcType=TIMESTAMP},
+			#{sumNum,jdbcType=INTEGER},#{couponRate,jdbcType=DECIMAL},#{fullMoney,jdbcType=DECIMAL},
+			#{minusMoney,jdbcType=DECIMAL},#{remark,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<update id="update" parameterType="Coupon">
+		UPDATE dn_coupon 
+		<set>
+			<if test="couponName!=null">
+				CouponName = #{couponName,jdbcType=VARCHAR},
+			</if>
+			<if test="startTime!=null">
+				StartTime = #{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime!=null">
+				EndTime = #{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="sumNum!=null">
+				SumNum = #{sumNum,jdbcType=INTEGER},
+			</if>
+			<if test="couponRate!=null">
+				CouponRate = #{couponRate,jdbcType=DECIMAL},
+			</if>
+			<if test="fullMoney!=null">
+				FullMoney = #{fullMoney,jdbcType=DECIMAL},
+			</if>
+			<if test="minusMoney!=null">
+				MinusMoney = #{minusMoney,jdbcType=DECIMAL},
+			</if>
+			<if test="isEnable!=null">
+				IsEnable = #{isEnable,jdbcType=INTEGER},
+			</if>
+			<if test="remark!=null">
+				Remark = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="updateBy!=null">
+				UpdateBy = #{updateBy,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime!=null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<delete id="del" parameterType="long">
+		DELETE  from dn_coupon where ID = #{id,jdbcType=BIGINT}
+	</delete>
+	
+	<select id="getCouponInfo" parameterType="long" resultMap="CouponInfoMap">
+		SELECT ID,CouponName,SumNum as RemainNum,CouponType,StartTime,EndTime,CouponRate,FullMoney,MinusMoney,IsEnable,Remark  from dn_coupon 
+			where ID = #{id,jdbcType=BIGINT}
+	</select>
+	
+	<select id="getCouponInfoByNo" parameterType="string" resultMap="CouponInfoMap">
+		SELECT ID,CouponNo,CouponName,SumNum,CouponType,CouponStrategy,StartTime,EndTime,CouponRate,FullMoney,MinusMoney,IsEnable,Remark  from dn_coupon 
+		where CouponNo = #{couponNo,jdbcType=VARCHAR}
+	</select>
+</mapper> 

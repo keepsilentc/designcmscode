@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.SizeCountryMapper">
+	<resultMap id="BaseResultMap" type="SizeCountry">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="sizeCountryName" property="sizeCountryName" jdbcType="VARCHAR" />
+		<result column="orderBy" property="orderBy" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<select id = "getSizeCountrys"  resultMap="BaseResultMap">
+		SELECT ID,sizeCountryName from dn_sizecountry order by orderBy desc
+	</select>
+</mapper> 

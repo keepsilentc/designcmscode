@@ -1,0 +1,28 @@
+<div class="row">
+	<div class="col-xs-12" ng-cloak>
+   		<div class="col-xs-12">
+   			<p>
+   				昵称：{{userInfo.nickName}}
+   			</p>
+   			<p>
+   				登陆类型：
+   				<span ng-if="userInfo.mobileNo!=null">手机号</span>
+				<span ng-if="userInfo.email!=null">邮箱</span>
+				<span ng-if="userInfo.platformType!=null">{{userInfo.platformType}}</span>
+   			</p>
+   			<p>
+   				登陆号：<span ng-if="userInfo.mobileNo!=null">{{userInfo.mobileNo}}</span>
+					<span ng-if="userInfo.email!=null">{{userInfo.email}}</span>
+					<span ng-if="userInfo.platformType!=null">{{userInfo.platformId}}</span>
+   			</p>
+   			<p>
+   				上次登陆时间：
+   				{{userInfo.loginTime|date:'yyyy-MM-dd HH:mm:ss'}}
+   			</p>
+   			<p>
+   				创建时间：
+   				{{userInfo.createTime|date:'yyyy-MM-dd HH:mm:ss'}}
+   			</p>
+   		</div>
+  	</div>
+</div>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.CouponUserMapper">
+	<resultMap id="BaseResultMap" type="CouponUser">
+		<id column="id" property="id" jdbcType="BIGINT"/>
+		<result column="UserNo" property="userNo" jdbcType="VARCHAR" />
+		<result column="CouponNo" property="couponNo" jdbcType="VARCHAR" />
+		<result column="IsEnable" property="isEnable" jdbcType="INTEGER" />
+		<result column="UserCouponState" property="userCouponState" jdbcType="INTEGER" />
+		<result column="ReceiveTime" property="receiveTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<insert id="batchInsert" parameterType="map">
+		INSERT INTO dn_user_coupon(UserNo,CouponNo,IsEnable,UserCouponState,ReceiveTime)values
+		<foreach collection="userNoList" separator="," item="item">
+			(#{item,jdbcType=VARCHAR},#{couponNo,jdbcType=VARCHAR},1,10,now())
+		</foreach>
+	</insert>
+	
+</mapper> 

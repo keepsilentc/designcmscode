@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.ProductMapper">
+	<resultMap id="BaseResultMap" type="Product">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="ThemeID" property="themeId" jdbcType="BIGINT" />
+		<result column="CategoryID" property="cateGoryId" jdbcType="BIGINT" />
+		<result column="DesignerId" property="designerId" jdbcType="BIGINT" />
+		<result column="BrandID" property="brandId" jdbcType="VARCHAR" />
+		<result column="ProductNo" property="productNo" jdbcType="VARCHAR" />
+		<result column="OriginPrice" property="originPrice" jdbcType="DECIMAL" />
+		<result column="Price" property="price" jdbcType="DECIMAL" />
+		<result column="Picture" property="picture" jdbcType="BIGINT" />
+		<result column="State" property="state" jdbcType="INTEGER" />
+		<result column="PreSellStartTime" property="preSellStartTime" jdbcType="TIMESTAMP" />
+		<result column="PreSellEndTime" property="preSellEndTime" jdbcType="TIMESTAMP" />
+		<result column="IsNew" property="isNew" jdbcType="INTEGER" />
+		<result column="IsRepresentative" property="isRepresentative" jdbcType="INTEGER" />
+		<result column="Remark" property="remark" jdbcType="VARCHAR" />
+		<result column="ProductName" property="productName" jdbcType="VARCHAR" />
+		<result column="IsEnable" property="isEnable" jdbcType="INTEGER" />
+		<result column="ProductDescribed" property="productDescribe" jdbcType="VARCHAR" />
+		<result column="ProductDetail" property="productDetail" jdbcType="VARCHAR" />
+		<result column="SizeDescribed" property="sizeDescribe" jdbcType="VARCHAR" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateBy" property="updateBy" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<insert id="insert" parameterType="Product" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO dn_product(ThemeID,CategoryID,DesignerId,BrandID,ProductNo,OriginPrice,
+								Price,Picture,State,PreSellStartTime,PreSellEndTime,
+								IsNew,IsRepresentative,Remark,ProductName,ProductDescribed,
+								ProductDetail,SizeDescribed,CreateTime)values
+		(#{themeId,jdbcType=BIGINT},#{cateGoryId,jdbcType=BIGINT},#{designerId,jdbcType=BIGINT},#{brandId,jdbcType=VARCHAR},#{productNo,jdbcType=VARCHAR},#{originPrice,jdbcType=DECIMAL},
+		#{price,jdbcType=DECIMAL},#{picture,jdbcType=BIGINT},#{state,jdbcType=INTEGER},#{preSellStartTime,jdbcType=TIMESTAMP},#{preSellEndTime,jdbcType=TIMESTAMP},
+		#{isNew,jdbcType=INTEGER},#{isRepresentative,jdbcType=INTEGER},#{remark,jdbcType=VARCHAR},#{productName,jdbcType=VARCHAR},#{productDescribe,jdbcType=VARCHAR},
+		#{productDetail,jdbcType=VARCHAR},#{sizeDescribe,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<select id="getProductByProductNo" parameterType="string" resultMap="BaseResultMap">
+		SELECT ID,ThemeID,CategoryID,DesignerId,BrandID,ProductNo,Price,
+			Picture,State,IsNew,IsRepresentative,Remark,ProductName,IsEnable,ProductDescribed,
+			ProductDetail,SizeDescribed,CreateTime from dn_product 
+		where ProductNo = #{productNo,jdbcType=VARCHAR} 
+	</select>
+	
+	<resultMap id="ProductInfoMap" type="ProductInfo" extends="BaseResultMap">
+		<result column="ThemeName" property="themeName" jdbcType="VARCHAR" />
+		<result column="CountryName" property="countryName" jdbcType="VARCHAR" />
+		<result column="CategoryName" property="categoryName" jdbcType="VARCHAR" />
+		<result column="BrandName" property="brandName" jdbcType="VARCHAR" />
+		<result column="DesignerName" property="designerName" jdbcType="VARCHAR" />
+		<result column="CountryID" property="countryId" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<select id="getCount" parameterType="map" resultType="int">
+		SELECT count(0) FROM dn_product a 
+		LEFT JOIN dn_category b ON a.CategoryID = b.ID
+		LEFT JOIN designer_theme_country_brand_view c on a.ThemeID = c.themeId and a.DesignerId = c.designerId and a.BrandID = c.brandId
+		<where>
+			<if test="countryId!=null">
+				c.CountryID = #{countryId,jdbcType=VARCHAR}
+			</if>
+			<if test="brandId!=null">
+				and a.BrandID = #{brandId,jdbcType=VARCHAR}
+			</if>
+			<if test="designerId!=null">
+				and a.DesignerId = #{designerId,jdbcType=BIGINT}
+			</if>
+			<if test="themeId!=null">
+				and a.ThemeID = #{themeId,jdbcType=BIGINT}
+			</if>
+			<if test="categoryId!=null">
+				and a.CategoryID = #{categoryId,jdbcType=BIGINT}
+			</if>
+			<if test="productName!=null">
+				and a.ProductName like CONCAT('%',#{productName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="productNo!=null">
+				and a.ProductNo = #{productNo,jdbcType=VARCHAR}
+			</if>
+			<if test="isEnable!=null">
+				and a.IsEnable = #{isEnable,jdbcType=INTEGER}
+			</if>
+			<if test="state!=null">
+				and a.State = #{state,jdbcType=INTEGER}
+			</if>
+			<if test="startTime!=null">
+				<![CDATA[
+					and a.CreateTime >= #{startTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+			<if test="endTime!=null">
+				<![CDATA[
+					and a.CreateTime <= #{endTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+		</where>
+	</select>
+	<select id="getList" parameterType="map" resultMap="ProductInfoMap">
+		SELECT a.ID,a.ThemeID,a.CategoryID,a.DesignerId,c.DesignerName,c.CountryID,a.BrandID,a.ProductNo,a.Price,a.OriginPrice,a.PreSellStartTime,a.PreSellEndTime,
+			a.Picture,a.State,a.IsNew,a.IsRepresentative,a.Remark,a.ProductName,a.IsEnable,a.CreateTime,a.ProductDescribed,a.ProductDetail,a.SizeDescribed,
+			b.CategoryName,c.ThemeName,c.CountryName,c.BrandName
+		FROM dn_product a 
+		LEFT JOIN dn_category b ON a.CategoryID = b.ID
+		LEFT JOIN designer_theme_country_brand_view c on a.ThemeID = c.themeId and a.DesignerId = c.designerId and a.BrandID = c.brandId
+		<where>
+			<if test="countryId!=null">
+				c.CountryID = #{countryId,jdbcType=VARCHAR}
+			</if>
+			<if test="brandId!=null">
+				and a.BrandID = #{brandId,jdbcType=VARCHAR}
+			</if>
+			<if test="designerId!=null">
+				and a.DesignerId = #{designerId,jdbcType=BIGINT}
+			</if>
+			<if test="themeId!=null">
+				and a.ThemeID = #{themeId,jdbcType=BIGINT}
+			</if>
+			<if test="categoryId!=null">
+				and a.CategoryID = #{categoryId,jdbcType=BIGINT}
+			</if>
+			<if test="productName!=null">
+				and a.ProductName like CONCAT('%',#{productName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="productNo!=null">
+				and a.ProductNo = #{productNo,jdbcType=VARCHAR}
+			</if>
+			<if test="isEnable!=null">
+				and a.IsEnable = #{isEnable,jdbcType=INTEGER}
+			</if>
+			<if test="state!=null">
+				and a.State = #{state,jdbcType=INTEGER}
+			</if>
+			<if test="startTime!=null">
+				<![CDATA[
+					and a.CreateTime >= #{startTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+			<if test="endTime!=null">
+				<![CDATA[
+					and a.CreateTime <= #{endTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+		</where>
+		<choose>
+			<when test="orderBy==1">
+				order by a.CreateTime desc
+			</when>
+			<when test="orderBy==2">
+				order by a.CreateTime 
+			</when>
+			<when test="orderBy==3">
+				order by a.Price desc
+			</when>
+			<when test="orderBy==4">
+				order by a.Price 
+			</when>
+			<otherwise>
+				order by a.CreateTime desc
+			</otherwise>
+		</choose>
+		limit #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	</select>
+	
+	<update id="update" parameterType="Product">
+		UPDATE dn_product 
+		<set>
+			<if test="themeId!=null">
+				ThemeID = #{themeId,jdbcType=BIGINT},
+			</if>
+			<if test="cateGoryId!=null">
+				CategoryID = #{cateGoryId,jdbcType=BIGINT},
+			</if>
+			<if test="designerId!=null">
+				DesignerId = #{designerId,jdbcType=BIGINT},
+			</if>
+			<if test="brandId!=null">
+				BrandID = #{brandId,jdbcType=VARCHAR},
+			</if>
+			<if test="productName!=null">
+				ProductName = #{productName,jdbcType=VARCHAR},
+			</if>
+			<if test="originPrice!=null">
+				OriginPrice = #{originPrice,jdbcType=DECIMAL},
+			</if>
+			<if test="price!=null">
+				Price = #{price,jdbcType=DECIMAL},
+			</if>
+			<if test="picture!=null">
+				Picture = #{picture,jdbcType=BIGINT},
+			</if>
+			<if test="state!=null">
+				State = #{state,jdbcType=INTEGER},
+			</if>
+			<if test="preSellStartTime!=null">
+				PreSellStartTime = #{preSellStartTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="preSellEndTime!=null">
+				PreSellEndTime = #{preSellEndTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="isNew!=null">
+				IsNew = #{isNew,jdbcType=INTEGER},
+			</if>
+			<if test="isRepresentative!=null">
+				IsRepresentative = #{isRepresentative,jdbcType=INTEGER},
+			</if>
+			<if test="isEnable!=null">
+				IsEnable = #{isEnable,jdbcType=INTEGER},
+			</if>
+			<if test="productDescribe!=null">
+				ProductDescribed = #{productDescribe,jdbcType=VARCHAR},
+			</if>
+			<if test="productDetail!=null">
+				ProductDetail = #{productDetail,jdbcType=VARCHAR},
+			</if>
+			<if test="sizeDescribe!=null">
+				SizeDescribed = #{sizeDescribe,jdbcType=VARCHAR},
+			</if>
+			<if test="updateBy!=null">
+				UpdateBy = #{updateBy,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime!=null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		where ProductNo = #{productNo,jdbcType=VARCHAR} and ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<select id="getProductList" parameterType="map" resultMap="ProductInfoMap">
+		SELECT a.ID,a.ThemeID,a.CategoryID,a.DesignerId,c.DesignerName,c.CountryID,a.BrandID,a.ProductNo,a.Price,a.OriginPrice,
+			a.Picture,a.State,a.IsNew,a.IsRepresentative,a.Remark,a.ProductName,a.IsEnable,a.CreateTime,a.ProductDescribed,
+			a.ProductDetail,a.SizeDescribed,b.CategoryName,c.ThemeName,c.CountryName,c.BrandName 
+		FROM dn_product a 
+		LEFT JOIN dn_category b ON a.CategoryID = b.ID 
+		LEFT JOIN designer_theme_country_brand_view c on a.ThemeID = c.themeId and a.DesignerId = c.designerId and a.BrandID = c.brandId
+		<where>
+			<if test="countryId!=null">
+				c.CountryID = #{countryId,jdbcType=VARCHAR}
+			</if>
+			<if test="brandId!=null">
+				and a.BrandID = #{brandId,jdbcType=VARCHAR}
+			</if>
+			<if test="designerId!=null">
+				and a.DesignerId = #{designerId,jdbcType=BIGINT}
+			</if>
+			<if test="themeId!=null">
+				and a.ThemeID = #{themeId,jdbcType=BIGINT}
+			</if>
+			<if test="categoryId!=null">
+				and a.CategoryID = #{categoryId,jdbcType=BIGINT}
+			</if>
+			<if test="productName!=null">
+				and a.ProductName like CONCAT('%',#{productName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="productNo!=null">
+				and a.ProductNo = #{productNo,jdbcType=VARCHAR}
+			</if>
+			<if test="isEnable!=null">
+				and a.IsEnable = #{isEnable,jdbcType=INTEGER}
+			</if>
+		</where>
+		order by a.CreateTime desc
+	</select>
+
+	<select id="getExportData" parameterType="map" resultType="map">
+		SELECT a.ID,a.ThemeID,a.CategoryID,a.DesignerId,c.DesignerName,c.CountryID,a.BrandID,a.ProductNo,a.Price,a.OriginPrice,
+			a.Picture,a.State,a.PreSellStartTime,a.PreSellEndTime,a.IsNew,a.IsRepresentative,a.Remark,a.ProductName,a.IsEnable,
+			a.CreateTime,a.ProductDescribed,a.ProductDetail,a.SizeDescribed,b.CategoryName,c.ThemeName,c.CountryName,c.BrandName 
+		FROM dn_product a 
+		LEFT JOIN dn_category b ON a.CategoryID = b.ID
+		LEFT JOIN designer_theme_country_brand_view c on a.ThemeID = c.themeId and a.DesignerId = c.designerId and a.BrandID = c.brandId
+		<where>
+			<if test="countryId!=null">
+				c.CountryID = #{countryId,jdbcType=VARCHAR}
+			</if>
+			<if test="brandId!=null">
+				and a.BrandID = #{brandId,jdbcType=VARCHAR}
+			</if>
+			<if test="designerId!=null">
+				and a.DesignerId = #{designerId,jdbcType=BIGINT}
+			</if>
+			<if test="themeId!=null">
+				and a.ThemeID = #{themeId,jdbcType=BIGINT}
+			</if>
+			<if test="categoryId!=null">
+				and a.CategoryID = #{categoryId,jdbcType=BIGINT}
+			</if>
+			<if test="productName!=null">
+				and a.ProductName like CONCAT('%',#{productName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="productNo!=null">
+				and a.ProductNo = #{productNo,jdbcType=VARCHAR}
+			</if>
+			<if test="isEnable!=null">
+				and a.IsEnable = #{isEnable,jdbcType=INTEGER}
+			</if>
+			<if test="state!=null">
+				and a.State = #{state,jdbcType=INTEGER}
+			</if>
+			<if test="startTime!=null">
+				<![CDATA[
+						and a.CreateTime >= #{startTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+			<if test="endTime!=null">
+				<![CDATA[
+						and a.CreateTime <= #{endTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+		</where>
+		order by a.CreateTime desc
+	</select>
+	
+	<insert id="batchInsert" parameterType="list">
+		INSERT INTO dn_product(ThemeID,CategoryID,DesignerId,BrandID,ProductNo,OriginPrice,
+								Price,Picture,State,PreSellStartTime,PreSellEndTime,
+								IsNew,IsRepresentative,Remark,ProductName,ProductDescribed,
+								ProductDetail,SizeDescribed,CreateTime)values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.themeId,jdbcType=BIGINT},#{item.cateGoryId,jdbcType=BIGINT},#{item.designerId,jdbcType=BIGINT},#{item.brandId,jdbcType=VARCHAR},#{item.productNo,jdbcType=VARCHAR},#{item.originPrice,jdbcType=DECIMAL},
+			#{item.price,jdbcType=DECIMAL},#{item.picture,jdbcType=BIGINT},#{item.state,jdbcType=INTEGER},#{item.preSellStartTime,jdbcType=TIMESTAMP},#{item.preSellEndTime,jdbcType=TIMESTAMP},
+			#{item.isNew,jdbcType=INTEGER},#{item.isRepresentative,jdbcType=INTEGER},#{item.remark,jdbcType=VARCHAR},#{item.productName,jdbcType=VARCHAR},#{item.productDescribe,jdbcType=VARCHAR},
+			#{item.productDetail,jdbcType=VARCHAR},#{item.sizeDescribe,jdbcType=VARCHAR},#{item.createTime,jdbcType=TIMESTAMP})
+		</foreach>
+		
+	</insert>
+	
+	<delete id="del" parameterType="long">
+		DELETE from dn_product where ID = #{id,jdbcType=BIGINT}
+	</delete>
+</mapper> 

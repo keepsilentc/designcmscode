@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.CmsResourceMapper">
+	<resultMap id="BaseResultMap" type="CmsResources">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="parentId" property="parentId" jdbcType="BIGINT" />
+		<result column="parentName" property="parentName" jdbcType="VARCHAR" />
+		<result column="resKey" property="resKey" jdbcType="VARCHAR" />
+		<result column="resUrl" property="resUrl" jdbcType="VARCHAR" />
+		<result column="level" property="level" jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<sql id="basefield">ID,name,parentId,parentName,resKey,resUrl,level,type,description</sql>
+	<select id="getAllResources" resultMap="BaseResultMap">
+		SELECT <include refid="basefield"></include>  from cms_resources order by type
+	</select>
+	<select id="getUserResources" resultMap="BaseResultMap" parameterType="long">
+		SELECT <include refid="basefield"></include> FROM cms_resources WHERE id IN(
+			SELECT resc_id FROM cms_resources_role WHERE role_id IN (
+				SELECT a.role_id FROM cms_user_role a INNER JOIN cms_role b ON a.role_id = b.id AND b.status = 1 WHERE user_id = #{id,jdbcType=BIGINT} 
+			)
+		)
+	</select>
+	
+	<resultMap  id="RoleResourcesMap" type="CmsResourcesInfo" extends="BaseResultMap">
+		<result column="Choose" property="choose" jdbcType="BOOLEAN"/>
+	</resultMap>
+	<select id="getRoleResources" parameterType="long" resultMap="RoleResourcesMap">
+		SELECT a.ID,a.name,a.parentId,a.parentName,a.resKey,a.resUrl,a.level,a.type,a.description,CASE WHEN b.resc_id IS NULL THEN FALSE ELSE TRUE END AS Choose 
+		FROM cms_resources a 
+		LEFT JOIN cms_resources_role b ON a.id = b.resc_id AND b.role_id = #{roleId,jdbcType=BIGINT}
+		ORDER BY TYPE
+	</select>
+</mapper> 

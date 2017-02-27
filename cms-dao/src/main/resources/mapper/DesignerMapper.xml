@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.DesignerMapper">
+	<resultMap id="BaseResultMap" type="Designer">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="CountryID" property="countryId" jdbcType="VARCHAR" />
+		<result column="DesignerName" property="designerName" jdbcType="VARCHAR" />
+		<result column="BrandID" property="brandId" jdbcType="VARCHAR" />
+		<result column="Photo" property="photo" jdbcType="BIGINT" />
+		<result column="Described" property="described" jdbcType="VARCHAR" />
+		<result column="Remark" property="remark" jdbcType="VARCHAR" />
+		<result column="IsEnable" property="isEnable" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateBy" property="updateBy" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<resultMap  id="DesignersInfoMap" type="DesignerInfo" extends="BaseResultMap">
+		<result column="CountryName" property="countryName" jdbcType="VARCHAR" />
+		<result column="BrandName" property="brandName" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<insert id="insert" parameterType="Designer" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO DN_Designer(CountryID,DesignerName,BrandID,Photo,Described,Remark,IsEnable,CreateTime)
+		values(#{countryId,jdbcType=VARCHAR},#{designerName,jdbcType=VARCHAR},#{brandId,jdbcType=VARCHAR},
+				#{photo,jdbcType=BIGINT},#{described,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR},#{isEnable,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<select id="getCount" parameterType="map" resultType="int">
+		SELECT count(0) FROM DN_Designer a 
+		LEFT JOIN dn_brand b ON a.BrandID = b.ID
+		LEFT JOIN dn_country c ON a.CountryID = c.ID
+		<where>
+			<if test="countryId!=null">
+				a.CountryID = #{countryId,jdbcType=VARCHAR}
+			</if>
+			<if test="brandId!=null">
+				and a.BrandID = #{brandId,jdbcType=VARCHAR}
+			</if>
+			<if test="designerName!=null">
+				and a.DesignerName like CONCAT('%',#{designerName,jdbcType=VARCHAR},'%')  
+			</if>
+			<if test="isEnable!=null">
+				and a.IsEnable = #{isEnable,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+	<select id="getList" parameterType="map" resultMap="DesignersInfoMap">
+		SELECT a.ID,a.CountryID,a.DesignerName,a.BrandID,a.Photo,c.CountryName,b.BrandName,a.Described,a.Remark,a.IsEnable FROM DN_Designer a 
+		LEFT JOIN dn_brand b ON a.BrandID = b.ID
+		LEFT JOIN dn_country c ON a.CountryID = c.ID
+		<where>
+			<if test="countryId!=null">
+				a.CountryID = #{countryId,jdbcType=VARCHAR}
+			</if>
+			<if test="brandId!=null">
+				and a.BrandID = #{brandId,jdbcType=VARCHAR}
+			</if>
+			<if test="designerName!=null">
+				and a.DesignerName like CONCAT('%',#{designerName,jdbcType=VARCHAR},'%')  
+			</if>
+			<if test="isEnable!=null">
+				and a.IsEnable = #{isEnable,jdbcType=INTEGER}
+			</if>
+		</where>
+		order by CreateTime desc
+		limit #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getDesignersByCondition" parameterType="map" resultMap="DesignersInfoMap">
+		SELECT a.ID,a.CountryID,a.DesignerName,a.BrandID,a.Photo,c.CountryName,b.BrandName FROM DN_Designer a 
+		LEFT JOIN dn_brand b ON a.BrandID = b.ID
+		LEFT JOIN dn_country c ON a.CountryID = c.ID
+		<where>
+			<if test="countryId!=null">
+				a.CountryID = #{countryId,jdbcType=VARCHAR}
+			</if>
+			<if test="brandId!=null">
+				and a.BrandID = #{brandId,jdbcType=VARCHAR}
+			</if>
+			<if test="designerName!=null">
+				and a.DesignerName like CONCAT('%',#{designerName,jdbcType=VARCHAR},'%')  
+			</if>
+		</where>
+		order by a.DesignerName
+	</select>
+	
+	
+	<delete id="delDesignerById" parameterType="long">
+		DELETE from DN_Designer where ID = #{id,jdbcType=BIGINT}
+	</delete>
+	
+	<update id="update" parameterType="Designer">
+		UPDATE DN_Designer
+		<set>
+			<if test="countryId!=null">
+				CountryID = #{countryId,jdbcType=VARCHAR},
+			</if>
+			<if test="designerName!=null">
+				DesignerName = #{designerName,jdbcType=VARCHAR},
+			</if>
+			<if test="brandId!=null">
+				BrandID = #{brandId,jdbcType=VARCHAR},
+			</if>
+			<if test="photo!=null">
+				Photo = #{photo,jdbcType=VARCHAR},
+			</if>
+			<if test="described!=null">
+				Described = #{described,jdbcType=VARCHAR},
+			</if>
+			<if test="remark!=null">
+				Remark = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="isEnable!=null">
+				IsEnable = #{isEnable,jdbcType=INTEGER},
+			</if>
+			<if test="updateBy!=null">
+				UpdateBy = #{updateBy,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime!=null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+		
+	</update>
+	
+	<select id="getExportData" parameterType="map" resultType="map">
+		SELECT a.ID,a.CountryID,a.DesignerName,a.BrandID,a.Photo,c.CountryName,b.BrandName,a.Described,a.Remark,a.IsEnable,a.CreateTime FROM DN_Designer a 
+		LEFT JOIN dn_brand b ON a.BrandID = b.ID
+		LEFT JOIN dn_country c ON a.CountryID = c.ID
+		<where>
+			<if test="countryId!=null">
+				a.CountryID = #{countryId,jdbcType=VARCHAR}
+			</if>
+			<if test="brandId!=null">
+				and a.BrandID = #{brandId,jdbcType=VARCHAR}
+			</if>
+			<if test="designerName!=null">
+				and a.DesignerName like CONCAT('%',#{designerName,jdbcType=VARCHAR},'%')  
+			</if>
+			<if test="isEnable!=null">
+				and a.IsEnable = #{isEnable,jdbcType=INTEGER}
+			</if>
+		</where>
+		order by DesignerName
+	</select>
+</mapper> 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.ColorMapper">
+	<resultMap id="BaseResultMap" type="Color">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="Picture" property="picture" jdbcType="BIGINT" />
+	</resultMap>
+	
+	<insert id="insert" parameterType="Color" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO dn_color(name,Picture)
+		values(#{name,jdbcType=VARCHAR},#{picture,jdbcType=BIGINT})
+	</insert>
+	
+	<update id="update" parameterType="Color">
+		UPDATE dn_color 
+		<set>
+			<if test="name!=null">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="picture!=null">
+				Picture = #{picture,jdbcType=BIGINT}
+			</if>
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<delete id="del" parameterType="long">
+		DELETE  from dn_color where ID = #{id,jdbcType=BIGINT}
+	</delete>
+	
+	<select id = "getAllColor" parameterType="string" resultMap="BaseResultMap">
+		SELECT ID,name,Picture from dn_color 
+		<where>
+			<if test="colorName!=null">
+				name like CONCAT('%',#{colorName,jdbcType=VARCHAR},'%')  
+			</if>
+		</where>
+		order by name
+	</select>
+	
+</mapper> 

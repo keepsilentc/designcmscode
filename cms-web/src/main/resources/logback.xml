@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+	<property name="context_name" value="design_cms_WEB" />
+
+	<conversionRule conversionWord="tracelogid" converterClass="com.design.cms.common.assist.TraceLogIdConverter" />
+
+	<appender name="design_cms_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>/usr/local/chicunlog/design.cms.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>/usr/local/chicunlog/design.cms.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>90</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%tracelogid] %-5level [%logger] - %msg%n</pattern>
+			<immediateFlush>true</immediateFlush>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>
+		</encoder>
+	</appender>
+	
+	<appender name="design_cms_console_log" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>   
+      		<pattern>%d{HH:mm:ss.SSS} [%tracelogid] %-5level %logger - %msg%n</pattern>   
+   		</encoder>
+	</appender>
+
+	<logger name="com.design.cms" level="DEBUG">
+		
+	</logger>
+	
+	<root level="DEBUG">
+		<appender-ref ref="design_cms_console_log" />
+	</root>
+	
+	<!-- <root level="DEBUG">
+		<appender-ref ref="design_cms_log" />
+	</root> -->
+
+	<!--jar-->
+	<logger name="com.alibaba.druid" level="debug" />
+	<logger name="org.hibernate.validator" level="INFO" ></logger>
+	<logger name="org.dozer" level="INFO"></logger>
+
+</configuration>

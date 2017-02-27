@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.CmsRoleResourceMapper">
+	<resultMap id="BaseResultMap" type="CmsRoleResources">
+		<result column="resc_id" property="resourceId" jdbcType="BIGINT" />
+		<result column="role_id" property="roleId" jdbcType="BIGINT" />
+	</resultMap>
+	
+	<insert id="batchinsert" parameterType="list">
+		INSERT INTO cms_resources_role(resc_id,role_id)values
+		<foreach collection="list" item="item" separator="," >
+			(#{item.resourceId},#{item.roleId})
+		</foreach>
+	</insert>
+	
+	<delete id="delteByRoleId" parameterType="long">
+		DELETE from cms_resources_role where role_id = #{roleId,jdbcType=BIGINT}
+	</delete>
+
+</mapper> 

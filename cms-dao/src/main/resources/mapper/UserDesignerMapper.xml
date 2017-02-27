@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.UserDesignerMapper">
+	<resultMap id="BaseResultMap" type="UserDesigner">
+		<result column="UserNo" property="userNo" jdbcType="VARCHAR" />
+		<result column="DesignerId" property="designerId" jdbcType="BIGINT" />
+		<result column="isPraise" property="isPraise" jdbcType="INTEGER" />
+		<result column="isInterest" property="isInterest" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<select id="getPraiseNumByDesignerId" parameterType="long" resultType="int">
+		SELECT count(0) from DN_User_Designer where DesignerId = #{designerId,jdbcType=BIGINT}
+	</select>
+	
+	
+</mapper> 

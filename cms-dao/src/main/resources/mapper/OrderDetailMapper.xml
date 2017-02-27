@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.OrderDetailMapper">
+	<resultMap id="BaseResultMap" type="OrderDetail">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="OrderNo" property="orderNo" jdbcType="VARCHAR" />
+		<result column="ProductNo" property="productNo" jdbcType="VARCHAR" />
+		<result column="PtstcID" property="ptstId" jdbcType="BIGINT" />
+		<result column="ProductState" property="productState" jdbcType="INTEGER" />
+		<result column="PreOrderNo" property="preOrderNo" jdbcType="VARCHAR" />
+		<result column="OrderDetailState" property="orderDetailState" jdbcType="INTEGER" />
+		<result column="CurrencyID" property="currencyId" jdbcType="VARCHAR" />
+		<result column="ProductBuyNum" property="ptBuyNum" jdbcType="INTEGER" />
+		<result column="ProductSumMoney" property="ptsumMoney" jdbcType="DECIMAL" />
+		<result column="ModifyCount" property="modifyCount" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="BaseField">
+		ID,OrderNo,ProductNo,PtstcID,ProductState,PreOrderNo,OrderDetailState,CurrencyID,ProductBuyNum,ProductSumMoney,ModifyCount,CreateTime 
+	</sql>
+	
+	<insert id="insertOrderDetail" parameterType="OrderDetail">
+		INSERT INTO dn_order_detail(OrderNo,ProductNo,PtstcID,ProductState,ProductBuyNum,ProductSumMoney,CreateTime)
+		values(#{orderNo,jdbcType=VARCHAR},#{productNo,jdbcType=VARCHAR},#{ptstId,jdbcType=BIGINT},#{productState,jdbcType=INTEGER},#{ptBuyNum,jdbcType=INTEGER},
+		#{ptsumMoney,jdbcType=DECIMAL},#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<select id="getOrderDetailList" parameterType="string" resultMap="BaseResultMap">
+		SELECT <include refid="BaseField"></include> from dn_order_detail where OrderNo = #{orderNo,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getOrderDetailById" parameterType="long" resultMap="BaseResultMap">
+		SELECT <include refid="BaseField"></include> from dn_order_detail where ID = #{id,jdbcType=BIGINT}
+	</select>
+	
+	<update id="updateOrderDetailAtnotify" parameterType="OrderDetail">
+		UPDATE dn_order_detail
+		<set>
+			ModifyCount = ModifyCount+1,
+			OrderDetailState = #{orderDetailState,jdbcType=INTEGER}
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+</mapper> 

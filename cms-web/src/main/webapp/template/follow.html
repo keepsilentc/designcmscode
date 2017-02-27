@@ -1,0 +1,36 @@
+<div class="row">
+	<div class="col-xs-12" ng-cloak>
+   		<ul class="list-group">
+			  <li class="list-group-item" ng-repeat="item in refundLogList">
+			  		
+			  		<div class="col-xs-4">
+			  			{{item.createTime|date:'yyyy-MM-dd HH:mm:ss'}}
+			  		</div>
+			  		
+			  		<div class="col-xs-4">
+			  			退款个数：{{item.refundNum}}
+			  		</div>
+			  		
+			  		<div class="col-xs-4">
+				  		<font ng-if="item.refundState==-1">退款审核中</font>
+				  		<font ng-if="item.refundState==1">退款审核通过</font>
+				  		<font ng-if="item.refundState==0">退款审核失败</font>
+				  		<font ng-if="item.refundState==10">未退款</font>
+				  		<font ng-if="item.refundState==20">退款成功</font>
+				  		<font ng-if="item.refundState==40">退款失败</font>
+			  		</div>
+			  		
+			  		<div class="col-xs-12 bottom" ng-if="item.pictures">
+			  			附件：<img ng-src="{{ctx}}/file/get.do?id={{picture}}" ng-repeat="picture in item.pictures.toString().split(',')" alt="..." class="img-thumbnail imgin">
+			  		</div>
+			  		
+			  		<div class="col-xs-12 bottom">
+			  			<font ng-if="item.refundState==-1">退款原由：{{item.reason}}</font>
+			  			<font ng-if="item.refundState==0">失败原因：{{item.reason}}</font>
+			  		</div>
+			  		
+			  		<div class="clearfix"></div>
+			  </li>
+		</ul>
+  	</div>
+</div>

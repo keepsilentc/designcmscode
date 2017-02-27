@@ -1,0 +1,1 @@
+var tcApp = angular.module("tc",['ngFileUpload','ui.autocomplete','ngCookies']);

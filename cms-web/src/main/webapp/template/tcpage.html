@@ -1,0 +1,20 @@
+<div class="row" ng-if="pageCount>1">
+	<div class="col-sm-12">
+		<div style="max-height:72px;">
+			<ul class="pagination">
+				<li ng-click="prev()" ng-class="currentPage-1>0?'':'disabled'">
+					<a href="#">&laquo;</a>
+				</li>
+				<li ng-repeat="item in pagenums" ng-class="currentPage==item?'active':''" ng-click="pageChange(item)">
+					<a href="#" >
+						{{item}}
+					</a>
+				</li>
+				<li ng-click="next()" ng-class="currentPage+1<=pageCount?'':'disabled'">
+					<a href="#">&raquo;</a>
+				</li>
+				<label style="height:32px;line-height:32px;margin-left:8px;font-size:20px;">共:&nbsp;{{total}}条</label>
+			</ul>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.ReturnMapper">
+	<resultMap id="BaseResultMap" type="Returns">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="UserNo" property="userNo" jdbcType="VARCHAR" />
+		<result column="OrderNo" property="orderNo" jdbcType="VARCHAR" />
+		<result column="ReturnNo" property="returnNo" jdbcType="VARCHAR" />
+		<result column="OrderDetailId" property="orderDetailId" jdbcType="BIGINT" />
+		<result column="ProductNum" property="productNum" jdbcType="INTEGER" />
+		<result column="ReturnType" property="returnType" jdbcType="INTEGER" />
+		<result column="ReturnState" property="returnState" jdbcType="INTEGER" />
+		<result column="DeliverNo" property="deliverNo" jdbcType="VARCHAR" />
+		<result column="DeliverName" property="deliverName" jdbcType="VARCHAR" />
+		<result column="FailReason" property="failReason" jdbcType="VARCHAR" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateBy" property="updateBy" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="BaseField">
+		ID,UserNo,OrderNo,ReturnNo,OrderDetailId,ProductNum,ReturnType,ReturnState,DeliverNo,DeliverName,FailReason,CreateTime 
+	</sql>
+	
+	<select id="getCount" parameterType="map" resultType="int">
+		SELECT count(0) from dn_return
+		<where>
+			<if test="returnNo!=null">
+				ReturnNo = #{returnNo,jdbcType=VARCHAR}
+			</if>
+			<if test="orderNo!=null">
+				and OrderNo = #{orderNo,jdbcType=VARCHAR}
+			</if>
+			<if test="returnType!=null">
+				and ReturnType = #{returnNo,jdbcType=VARCHAR}
+			</if>
+			<if test="returnState!=null">
+				and ReturnState = #{returnNo,jdbcType=VARCHAR}
+			</if>
+			<if test="startTime!=null">
+				<![CDATA[
+						and CreateTime >= #{startTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+			<if test="endTime!=null">
+				<![CDATA[
+						and CreateTime <= #{endTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+		</where>
+	</select>
+	
+	<select id="getList" parameterType="map" resultMap="BaseResultMap">
+		SELECT <include refid="BaseField"></include> from dn_return
+		<where>
+			<if test="returnNo!=null">
+				ReturnNo = #{returnNo,jdbcType=VARCHAR}
+			</if>
+			<if test="orderNo!=null">
+				and OrderNo = #{orderNo,jdbcType=VARCHAR}
+			</if>
+			<if test="returnType!=null">
+				and ReturnType = #{returnNo,jdbcType=VARCHAR}
+			</if>
+			<if test="returnState!=null">
+				and ReturnState = #{returnNo,jdbcType=VARCHAR}
+			</if>
+			<if test="startTime!=null">
+				<![CDATA[
+						and CreateTime >= #{startTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+			<if test="endTime!=null">
+				<![CDATA[
+						and CreateTime <= #{endTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+		</where>
+		order by CreateTime desc
+		LIMIT #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	</select>
+	
+	<insert id="insert" parameterType="Returns" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO dn_return(UserNo,OrderNo,ReturnNo,OrderDetailId,ProductNum,ReturnType,ReturnState,CreateTime)
+		values(#{userNo,jdbcType=VARCHAR},#{orderNo,jdbcType=VARCHAR},#{returnNo,jdbcType=VARCHAR},#{orderDetailId,jdbcType=BIGINT},#{productNum,jdbcType=INTEGER},
+			#{returnType,jdbcType=INTEGER},#{returnState,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<update id="update" parameterType="Returns">
+		UPDATE dn_return
+		<set>
+			<if test="failReason!=null">
+				FailReason = #{failReason,jdbcType=VARCHAR},
+			</if>
+			<if test="updateBy!=null">
+				UpdateBy = #{updateBy,jdbcType=VARCHAR},
+			</if>
+			UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<select id="getReturnById" parameterType="long" resultMap="BaseResultMap">
+		SELECT <include refid="BaseField"></include> from dn_return where ID = #{id,jdbcType=BIGINT}
+	</select>
+	
+	<select id="getReturnsList" parameterType="map" resultMap="BaseResultMap">
+		SELECT <include refid="BaseField"></include> from dn_return
+		<where>
+			OrderNo = #{orderNo,jdbcType=VARCHAR}
+			and OrderDetailId = #{orderDetailId,jdbcType=BIGINT} 
+			<if test="returnType!=null">
+				and ReturnType = #{returnType,jdbcType=INTEGER}
+			</if>
+			<if test="returnState!=null">
+				and ReturnState = #{returnState,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+	
+</mapper> 

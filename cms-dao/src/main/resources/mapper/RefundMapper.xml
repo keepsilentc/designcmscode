@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.RefundMapper">
+	<resultMap id="BaseResultMap" type="Refund">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="RefundNo" property="refundNo" jdbcType="VARCHAR" />
+		<result column="UserNo" property="userNo" jdbcType="VARCHAR" />
+		<result column="OrderNo" property="orderNo" jdbcType="VARCHAR" />
+		<result column="OrderDetailId" property="orderDetailId" jdbcType="BIGINT" />
+		<result column="RefundNum" property="refundNum" jdbcType="INTEGER" />
+		<result column="RefundMondy" property="refundMoney" jdbcType="DECIMAL" />
+		<result column="CurrencyID" property="currencyId" jdbcType="VARCHAR" />
+		<result column="PayTypeId" property="payTypeId" jdbcType="VARCHAR" />
+		<result column="RefundType" property="refundType" jdbcType="INTEGER" />
+		<result column="RefundState" property="refundState" jdbcType="INTEGER" />
+		<result column="UpdateBy" property="updateBy" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="BaseField">
+		ID,RefundNo,UserNo,OrderNo,OrderDetailId,RefundNum,RefundMondy,PayTypeId,CurrencyID,RefundType,RefundState,CreateTime
+	</sql>
+	
+	<update id="update" parameterType="Refund">
+		UPDATE dn_refund 
+		<set>
+			<if test="refundState!=null">
+				RefundState = #{refundState,jdbcType=INTEGER},
+			</if>
+			<if test="updateBy!=null">
+				UpdateBy = #{updateBy,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime!=null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<select id="getCount" parameterType="map" resultType="int">
+		SELECT count(0) from dn_refund
+		<where>
+			<if test="refundNo!=null">
+				RefundNo = #{refundNo,jdbcType=VARCHAR}
+			</if>
+			<if test="orderNo!=null">
+				and OrderNo = #{orderNo,jdbcType=VARCHAR}
+			</if>
+			<if test="userNo!=null">
+				and UserNo = #{userNo,jdbcType=VARCHAR}
+			</if>
+			<if test="refundType!=null">
+				and RefundType = #{refundType,jdbcType=INTEGER}
+			</if>
+			<if test="refundState!=null">
+				and RefundState = #{refundState,jdbcType=INTEGER}
+			</if>
+			<if test="payTypeId!=null">
+				and PayTypeId = #{payTypeId,jdbcType=VARCHAR}
+			</if>
+			<if test="startTime!=null">
+				<![CDATA[
+						and CreateTime >= #{startTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+			<if test="endTime!=null">
+				<![CDATA[
+						and CreateTime <= #{endTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+		</where>
+	</select>
+	
+	<select id="getList" parameterType="map" resultMap="BaseResultMap">
+		SELECT <include refid="BaseField"></include> from dn_refund
+		<where>
+			<if test="refundNo!=null">
+				RefundNo = #{refundNo,jdbcType=VARCHAR}
+			</if>
+			<if test="orderNo!=null">
+				and OrderNo = #{orderNo,jdbcType=VARCHAR}
+			</if>
+			<if test="userNo!=null">
+				and UserNo = #{userNo,jdbcType=VARCHAR}
+			</if>
+			<if test="refundType!=null">
+				and RefundType = #{refundType,jdbcType=INTEGER}
+			</if>
+			<if test="refundState!=null">
+				and RefundState = #{refundState,jdbcType=INTEGER}
+			</if>
+			<if test="payTypeId!=null">
+				and PayTypeId = #{payTypeId,jdbcType=VARCHAR}
+			</if>
+			<if test="startTime!=null">
+				<![CDATA[
+						and CreateTime >= #{startTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+			<if test="endTime!=null">
+				<![CDATA[
+						and CreateTime <= #{endTime,jdbcType=TIMESTAMP}
+				]]>
+			</if>
+		</where>
+		order by CreateTime desc
+		LIMIT #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getRefundByRefundNo" parameterType="string" resultMap="BaseResultMap">
+		SELECT <include refid="BaseField"></include> from dn_refund where RefundNo = #{refundNo,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getRefundList" parameterType="map" resultMap="BaseResultMap">
+		SELECT <include refid="BaseField"></include> from DN_Refund
+		<where>
+			OrderNo = #{orderNo,jdbcType=VARCHAR}
+			<if test="orderDetailId!=null">
+				and OrderDetailId = #{orderDetailId,jdbcType=BIGINT} 
+			</if>
+			<if test="refundType!=null">
+				and RefundType = #{refundType,jdbcType=INTEGER}
+			</if>
+			<if test="refundState!=null">
+				and RefundState = #{refundState,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+	
+</mapper> 

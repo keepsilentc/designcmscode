@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.CarouselMapper">
+	<resultMap id="BaseResultMap" type="Carousel">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="Type" property="type" jdbcType="INTEGER" />
+		<result column="Picture" property="picture" jdbcType="BIGINT" />
+		<result column="OrderBy" property="orderBy" jdbcType="INTEGER" />
+		<result column="IsEnable" property="isEnable" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateBy" property="updateBy" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="BaseField">
+		ID,Type,Picture,OrderBy,IsEnable,CreateTime
+	</sql>
+	
+	<select id="getAllCarousel" resultMap="BaseResultMap">
+		SELECT <include refid="BaseField"></include> from DN_Carousel
+		<where>
+			<if test="type!=null">
+				Type = #{type}
+			</if>
+			<if test="isEnable!=null">
+				and IsEnable = #{isEnable}
+			</if>
+		</where>
+		order by orderBy
+	</select>
+	
+	<insert id="insert" parameterType="Carousel">
+		INSERT INTO DN_Carousel(Type,Picture,OrderBy,IsEnable,CreateTime)values(
+			#{type,jdbcType=INTEGER},#{picture,jdbcType=BIGINT},#{orderBy,jdbcType=INTEGER},#{isEnable,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP}
+		)
+	</insert>
+	
+	<update id="update" parameterType="Carousel">
+		UPDATE DN_Carousel
+		<set>
+			<if test="picture!=null">
+				Picture = #{picture,jdbcType=BIGINT},
+			</if>
+			<if test="orderBy!=null">
+				OrderBy = #{orderBy,jdbcType=INTEGER},
+			</if>
+			<if test="isEnable!=null">
+				IsEnable = #{isEnable,jdbcType=INTEGER},
+			</if>
+			<if test="updateBy!=null">
+				UpdateBy = #{updateBy,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime!=null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<delete id="del" parameterType="long">
+		DELETE FROM DN_Carousel where ID = #{id,jdbcType=BIGINT}
+	</delete>
+	
+</mapper> 

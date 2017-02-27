@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.ProductSizeColorMapper">
+	<resultMap id="BaseResultMap" type="ProductSizeColor">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="ProductNo" property="productNo" jdbcType="VARCHAR" />
+		<result column="SizeID" property="sizeId" jdbcType="BIGINT" />
+		<result column="ColorID" property="colorId" jdbcType="BIGINT" />
+		<result column="Picture" property="picture" jdbcType="BIGINT" />
+		<result column="Inventory" property="inventory" jdbcType="INTEGER" />
+		<result column="Sale" property="sale" jdbcType="INTEGER" />
+		<result column="IsEnable" property="isEnable" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateBy" property="updateBy" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<resultMap id="ProductSizeColorInfoMap" type="ProductSizeColorInfo" extends="BaseResultMap">
+		<result column="SizeName" property="sizeName" jdbcType="VARCHAR" />
+		<result column="colorName" property="colorName" jdbcType="VARCHAR" />
+		<result column="colorPicture" property="colorPicture" jdbcType="BIGINT" />
+	</resultMap>
+	
+	
+	<select id="getCount" parameterType="map" resultType="int">
+		SELECT count(0) FROM dn_product_size_color a LEFT JOIN dn_size b ON a.SizeID = b.id LEFT JOIN dn_color c ON a.ColorID = c.id
+		<where>
+				a.ProductNo = #{productNo,jdbcType=VARCHAR}
+			<if test="colorId!=null">
+				and a.ColorID = #{colorId,jdbcType=BIGINT}
+			</if>
+			<if test="sizeId!=null">
+				and a.SizeID = #{sizeId,jdbcType=BIGINT}
+			</if>
+		</where>
+	</select>
+	
+	<select id="getList" parameterType="map" resultMap="ProductSizeColorInfoMap">
+		SELECT a.ID,a.ProductNo,a.SizeID,a.ColorID,a.Picture,a.Inventory,a.Sale,a.IsEnable,
+			b.SizeName,c.name as colorName,c.Picture as colorPicture
+		FROM dn_product_size_color a LEFT JOIN dn_size b ON a.SizeID = b.id LEFT JOIN dn_color c ON a.ColorID = c.id
+		<where>
+				a.ProductNo = #{productNo,jdbcType=VARCHAR}
+			<if test="colorId!=null">
+				and a.ColorID = #{colorId,jdbcType=BIGINT}
+			</if>
+			<if test="sizeId!=null">
+				and a.SizeID = #{sizeId,jdbcType=BIGINT}
+			</if>
+		</where>
+		order by a.ColorID,a.SizeID 
+		limit #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	</select>
+	
+	<insert id="insert" parameterType="ProductSizeColor" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO dn_product_size_color(ProductNo,SizeID,ColorID,Picture,Inventory,CreateTime)
+		values(#{productNo,jdbcType=VARCHAR},#{sizeId,jdbcType=BIGINT},#{colorId,jdbcType=BIGINT},#{picture,jdbcType=BIGINT},
+		#{inventory,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<insert id="batchInsert" parameterType="list">
+		INSERT INTO dn_product_size_color(ProductNo,SizeID,ColorID,Inventory,CreateTime)values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.productNo,jdbcType=VARCHAR},#{item.sizeId,jdbcType=BIGINT},#{item.colorId,jdbcType=BIGINT},
+				#{item.inventory,jdbcType=INTEGER},#{item.createTime,jdbcType=TIMESTAMP})
+		</foreach>
+	</insert>
+	
+	<update id="update" parameterType="ProductSizeColor">
+		UPDATE dn_product_size_color
+		<set>
+			<if test="picture!=null">
+				Picture = #{picture,jdbcType=BIGINT},
+			</if>
+			<if test="sizeId!=null">
+				SizeID = #{sizeId,jdbcType=BIGINT},
+			</if>
+			<if test="colorId!=null">
+				ColorID = #{colorId,jdbcType=BIGINT},
+			</if>
+			<if test="inventory!=null">
+				Inventory = #{inventory,jdbcType=INTEGER},
+			</if>
+			<if test="isEnable!=null">
+				IsEnable = #{isEnable,jdbcType=INTEGER},
+			</if>
+			<if test="updateBy!=null">
+				UpdateBy = #{updateBy,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime!=null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		where ID = #{id,jdbcType=BIGINT} and ProductNo = #{productNo,jdbcType=VARCHAR}
+	</update>
+	
+	<update id="updateIsEnable">
+		UPDATE dn_product_size_color set IsEnable = #{isEnable,jdbcType=INTEGER} where ProductNo = #{productNo,jdbcType=VARCHAR}
+	</update>
+	
+	<select id="getExportData" parameterType="map" resultType="map">
+		SELECT a.ID,a.ProductNo,a.SizeID,a.ColorID,a.Picture,a.Inventory,a.Sale,a.IsEnable,
+			b.SizeName,c.name as colorName,c.Picture as colorPicture
+		FROM dn_product_size_color a LEFT JOIN dn_size b ON a.SizeID = b.id LEFT JOIN dn_color c ON a.ColorID = c.id
+		<where>
+				a.ProductNo = #{productNo,jdbcType=VARCHAR}
+			<if test="colorId!=null">
+				and a.ColorID = #{colorId,jdbcType=BIGINT}
+			</if>
+			<if test="sizeId!=null">
+				and a.SizeID = #{sizeId,jdbcType=BIGINT}
+			</if>
+		</where>
+		order by a.ColorID,a.SizeID 
+	</select>
+	
+	<select id="getProductColorSizeById" parameterType="long" resultMap="ProductSizeColorInfoMap">
+		SELECT a.ID,a.ProductNo,a.SizeID,a.ColorID,IFNULL(a.Picture,d.Picture) as Picture,a.Inventory,a.Sale,a.IsEnable,a.CreateTime,b.SizeName,c.Picture as ColorPicture,c.name AS colorName,d.ProductName
+		FROM dn_product_size_color a LEFT JOIN dn_size b ON a.SizeID = b.id LEFT JOIN dn_color c ON a.ColorID = c.id 
+		LEFT JOIN dn_product d ON a.ProductNo = d.ProductNo
+		WHERE a.ID = #{id,jdbcType=BIGINT}
+	</select>
+	
+	<select id="getproductColorSizeByParam" parameterType="map" resultMap="ProductSizeColorInfoMap">
+		SELECT a.ID,a.ProductNo,a.SizeID,a.ColorID,a.Picture,a.Inventory,a.Sale,a.IsEnable,a.CreateTime,b.SizeName,c.name as colorName
+		from dn_product_size_color a LEFT JOIN dn_size b ON a.SizeID = b.id LEFT JOIN dn_color c ON a.ColorID = c.id
+		where a.ProductNo = #{productNo,jdbcType=VARCHAR} and a.SizeID = #{sizeId,jdbcType=BIGINT} and a.ColorID = #{colorId,jdbcType=BIGINT}
+	</select>
+	
+	<delete id="del" parameterType="long">
+		DELETE from dn_product_size_color where ID = #{id,jdbcType=BIGINT}
+	</delete>
+</mapper> 

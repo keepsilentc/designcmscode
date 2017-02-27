@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.StatusMapper">
+	<resultMap id="BaseResultMap" type="Status">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="StatusTypeId" property="statusTypeId" jdbcType="BIGINT" />
+		<result column="ThemeID" property="themeId" jdbcType="BIGINT" />
+		<result column="StatusName" property="statusName" jdbcType="VARCHAR" />
+		<result column="Described" property="describe" jdbcType="VARCHAR" />
+		<result column="StatusDetailUrl" property="statusDetailUrl" jdbcType="VARCHAR" />
+		<result column="Picture" property="picture" jdbcType="BIGINT" />
+		<result column="PictureWidth" property="pictureWidth" jdbcType="INTEGER"/>
+		<result column="PictureHeight" property="pictureHeight" jdbcType="INTEGER"/>
+		<result column="InsidePicture" property="insidePicture" jdbcType="BIGINT" />
+		<result column="IsEnable" property="isEnable" jdbcType="INTEGER" />
+		<result column="orderBy" property="orderBy" jdbcType="INTEGER" />
+		<result column="updateBy" property="updateBy" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<insert id="insert" parameterType="Status" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO dn_status(StatusTypeId,ThemeID,StatusName,Described,StatusDetailUrl,orderBy,CreateTime)
+		values(#{statusTypeId,jdbcType=BIGINT},#{themeId,jdbcType=BIGINT},#{statusName,jdbcType=VARCHAR},#{describe,jdbcType=VARCHAR},
+			#{statusDetailUrl,jdbcType=VARCHAR},#{orderBy,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<update id="update" parameterType="Status">
+		UPDATE dn_status
+		<set>
+			<if test="statusName!=null">
+				StatusName = #{statusName,jdbcType=VARCHAR},
+			</if>
+			<if test="describe!=null">
+				Described = #{describe,jdbcType=VARCHAR},
+			</if>
+			<if test="statusDetailUrl!=null">
+				StatusDetailUrl = #{statusDetailUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="picture!=null">
+				Picture = #{picture,jdbcType=BIGINT},
+				PictureWidth = #{pictureWidth,jdbcType=INTEGER},
+				PictureHeight = #{pictureHeight,jdbcType=INTEGER},
+			</if>
+			<if test="insidePicture!=null">
+				InsidePicture = #{insidePicture,jdbcType=BIGINT},
+			</if>
+			<if test="isEnable!=null">
+				IsEnable = #{isEnable,jdbcType=INTEGER},
+			</if>
+			<if test="orderBy!=null">
+				orderBy = #{orderBy,jdbcType=INTEGER},
+			</if>
+			<if test="updateBy!=null">
+				updateBy = #{updateBy,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime!=null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<resultMap id="StatusInfoMap" type="StatusInfo" extends="BaseResultMap">
+		<result column="ThemeName" property="themeName" jdbcType="VARCHAR" />
+		<result column="StatusTypeName" property="statusTypeName" jdbcType="VARCHAR" />
+		<result column="DesignerName" property="designerName" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="getCount" parameterType="map" resultType="int">
+		SELECT count(0) FROM dn_status a LEFT JOIN dn_statustype b ON a.StatusTypeId = b.ID LEFT JOIN designer_theme_country_brand_view c ON a.ThemeID = c.themeId
+		<where>
+			<if test="statusTypeId!=null">
+				a.StatusTypeId = #{statusTypeId,jdbcType=BIGINT}
+			</if>
+			<if test="statusName!=null">
+				and a.StatusName like CONCAT('%',#{statusName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="isEnable!=null">
+				and a.IsEnable = #{isEnable,jdbcType=INTEGER}
+			</if>
+			<if test="designerId!=null">
+				and c.designerId = #{designerId,jdbcType=BIGINT}
+			</if>
+			<if test="themeId!=null">
+				and a.ThemeID = #{themeId,jdbcType=BIGINT}
+			</if>
+		</where>
+
+	</select>
+	
+	<select id="getList" parameterType="map" resultMap="StatusInfoMap">
+		SELECT a.ID,a.StatusTypeId,a.ThemeID,a.StatusName,a.Described,a.StatusDetailUrl,a.Picture,a.InsidePicture,a.IsEnable,a.orderBy,b.name as StatusTypeName,c.ThemeName,c.DesignerName   
+		FROM dn_status a 
+		LEFT JOIN dn_statustype b ON a.StatusTypeId = b.ID 
+		LEFT JOIN designer_theme_country_brand_view c ON a.ThemeID = c.themeId 
+		<where>
+			<if test="statusTypeId!=null">
+				a.StatusTypeId = #{statusTypeId,jdbcType=BIGINT}
+			</if>
+			<if test="statusName!=null">
+				and a.StatusName like CONCAT('%',#{statusName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="isEnable!=null">
+				and a.IsEnable = #{isEnable,jdbcType=INTEGER}
+			</if>
+			<if test="designerId!=null">
+				and c.designerId = #{designerId,jdbcType=BIGINT}
+			</if>
+			<if test="themeId!=null">
+				and a.ThemeID = #{themeId,jdbcType=BIGINT}
+			</if>
+		</where>
+		order by CreateTime desc 
+		limit #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	</select>
+	
+</mapper> 

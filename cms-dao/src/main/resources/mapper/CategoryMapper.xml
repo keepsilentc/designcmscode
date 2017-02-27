@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.CategoryMapper">
+	<resultMap id="BaseResultMap" type="Category">
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="ParentID" property="parentId" jdbcType="BIGINT" />
+		<result column="CategoryName" property="categoryName" jdbcType="VARCHAR" />
+		<result column="Rank" property="rank" jdbcType="INTEGER" />
+		<result column="Picture" property="picture" jdbcType="BIGINT" />
+		<result column="OrderBy" property="orderBy" jdbcType="INTEGER" />
+		<result column="IsEnable" property="isEnable" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<select id="getAllCateGorys" resultMap="BaseResultMap">
+		SELECT ID,ParentID,CategoryName,Rank,Picture,OrderBy FROM dn_category 
+	</select>
+	
+	<select id="getCategorys" resultMap="BaseResultMap">
+		SELECT ID,ParentID,CategoryName,Rank,Picture,OrderBy,IsEnable from dn_category
+		<where>
+			<choose>
+				<when test="parentId!=null">
+					ParentID = #{parentId,jdbcType=BIGINT}
+				</when>
+				<otherwise>
+					ParentID is null
+				</otherwise>
+			</choose>
+		</where>
+		ORDER BY OrderBy desc
+	</select>
+	
+	<insert id="insert" parameterType="Category" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO dn_category(ParentID,CategoryName,Rank,Picture,OrderBy,IsEnable)
+		values(#{parentId,jdbcType=BIGINT},#{categoryName,jdbcType=VARCHAR},queryCateGoryRank(#{parentId,jdbcType=INTEGER})+1,
+				#{picture,jdbcType=BIGINT},#{orderBy,jdbcType=INTEGER},#{isEnable,jdbcType=INTEGER})
+	</insert>
+	
+	<update id="update" parameterType="Category">
+		UPDATE dn_category 
+		<set>
+			<if test="categoryName!=null">
+				CategoryName = #{categoryName,jdbcType=VARCHAR},
+			</if>
+			<if test="picture!=null">
+				Picture = #{picture,jdbcType=BIGINT},
+			</if>
+			<if test="orderBy!=null">
+				OrderBy = #{orderBy,jdbcType=INTEGER},
+			</if>
+			<if test="isEnable!=null">
+				IsEnable = #{isEnable,jdbcType=INTEGER}
+			</if>
+		</set>
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+	<delete id="del">
+		DELETE from dn_category where id = #{id,jdbcType=BIGINT}
+	</delete>
+</mapper> 

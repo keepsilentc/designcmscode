@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                                 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd"> 
+   
+ 	<http pattern="/index.do" security="none" />
+ 	<http use-expressions="true" auto-config="false" entry-point-ref="myAuthenticationEntryPoint" access-denied-page="/denied.jsp">
+ 		<logout logout-success-url="/index.do" logout-url="/logout.do" invalidate-session="true" delete-cookies="JSESSIONID"/>
+ 		<!-- 会话管理 -->
+		<session-management invalid-session-url="/index.do" session-fixation-protection="none">
+			<concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
+		</session-management>
+ 		<custom-filter ref="myLoginFilter" position="FORM_LOGIN_FILTER"  />
+ 		<custom-filter ref="mySecurityFilter" before="FILTER_SECURITY_INTERCEPTOR"/>
+ 	</http>
+ 	
+ 	 <!-- 未登录的切入点 -->
+    <beans:bean id="myAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+        <beans:property name="loginFormUrl" value="/login.do"></beans:property>
+    </beans:bean>
+	<beans:bean id="myLoginFilter" init-method="init" class="com.design.cms.web.security.MyAuthenticationFilter">
+		<beans:property name="authenticationManager" ref="myAuthenticationManager" />
+		<beans:property name="filterProcessesUrl" value="/login.do" />
+	</beans:bean>
+	<authentication-manager alias="myAuthenticationManager">
+		<authentication-provider user-service-ref="myUserDetailServiceImpl" />
+	</authentication-manager>
+	
+</beans:beans>

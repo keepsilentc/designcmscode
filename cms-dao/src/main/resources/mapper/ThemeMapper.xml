@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.cms.dao.persist.ThemeMapper">
+	<resultMap id="BaseResultMap" type="Theme" >
+		<id column="ID" property="id" jdbcType="BIGINT" />
+		<result column="DesignerId" property="designerId" jdbcType="BIGINT" />
+		<result column="ThemeName" property="themeName" jdbcType="VARCHAR" />
+		<result column="Described" property="describe" jdbcType="VARCHAR" />
+		<result column="Picture" property="picture" jdbcType="BIGINT" />
+		<result column="IsEnable" property="isEnable" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateBy" property="updateBy" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<resultMap id="ThemeInfoMap" type="ThemeInfo" extends="BaseResultMap">
+		<result column="DesignerName" property="designerName" jdbcType="VARCHAR" />
+		<result column="PreSellStartTime" property="preSellStartTime" jdbcType="TIMESTAMP" />
+		<result column="PreSellEndTime" property="preSellEndTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<insert id="insert" parameterType="Theme" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO dn_theme(DesignerId,ThemeName,Described,Picture,IsEnable,CreateTime)
+		values(#{designerId,jdbcType=BIGINT},#{themeName,jdbcType=VARCHAR},#{describe,jdbcType=VARCHAR},#{picture,jdbcType=BIGINT},
+			#{isEnable,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<select id="getCount" parameterType="map" resultType="int">
+		SELECT count(0) FROM dn_theme a 
+			LEFT JOIN dn_designer b ON a.DesignerId = b.ID 
+		<where>
+			<if test="designerId!=null">
+				a.DesignerId = #{designerId,jdbcType=BIGINT}
+			</if>
+			<if test="themeName!=null">
+				and a.ThemeName like CONCAT('%',#{themeName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="isEnable!=null">
+				and a.IsEnable = #{isEnable,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+	
+	<select id="getList" parameterType="map" resultMap="ThemeInfoMap">
+		SELECT a.ID,a.DesignerId,b.DesignerName,a.ThemeName,a.Described,a.Picture,a.IsEnable,a.preSellStartTime,a.preSellEndTime  FROM dn_theme a 
+			LEFT JOIN dn_designer b ON a.DesignerId = b.ID 
+		<where>
+			<if test="designerId!=null">
+				a.DesignerId = #{designerId,jdbcType=BIGINT}
+			</if>
+			<if test="themeName!=null">
+				and a.ThemeName like CONCAT('%',#{themeName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="isEnable!=null">
+				and a.ISENABLE = #{isEnable,jdbcType=INTEGER}
+			</if>
+		</where>
+		order by a.CreateTime desc
+		limit #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	</select>
+	
+	<delete id="delTheme">
+		DELETE from dn_theme where ID = #{id,jdbcType=BIGINT}
+	</delete>
+	
+	<update id="update" parameterType="Theme">
+		UPDATE dn_theme 
+		<set>
+			<if test="designerId!=null">
+				DesignerId = #{designerId,jdbcType=BIGINT},
+			</if>
+			<if test="themeName!=null">
+				ThemeName = #{themeName,jdbcType=VARCHAR},
+			</if>
+			<if test="describe!=null">
+				Described = #{describe,jdbcType=VARCHAR},
+			</if>
+			<if test="picture!=null">
+				Picture = #{picture,jdbcType=BIGINT},
+			</if>
+			<if test="isEnable!=null">
+				IsEnable = #{isEnable,jdbcType=INTEGER},
+			</if>
+			<if test="updateBy!=null">
+				UpdateBy = #{updateBy,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime!=null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		where  ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<select id="getAllTheme" resultMap="BaseResultMap">
+		SELECT ID,ThemeName,DesignerId,Picture from dn_theme 
+		<where>
+			<if test="designerId!=null">
+				DesignerId = #{designerId,jdbcType=BIGINT}
+			</if>
+		</where>
+		order by ThemeName
+	</select>
+	
+	<select id="getExportData" parameterType="map" resultType="map">
+		SELECT a.ID,a.DesignerId,b.DesignerName,a.ThemeName,a.Described,a.Picture,a.IsEnable  FROM dn_theme a 
+			INNER JOIN dn_designer b ON a.DesignerId = b.ID and b.IsEnable = 1
+		<where>
+			<if test="designerId!=null">
+				a.DesignerId = #{designerId,jdbcType=BIGINT}
+			</if>
+			<if test="themeName!=null">
+				and a.ThemeName like CONCAT('%',#{themeName,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="isEnable!=null">
+				and a.ISENABLE = #{isEnable,jdbcType=INTEGER}
+			</if>
+		</where>
+		order by DesignerName,ThemeName
+	</select>
+	
+	<select id="getThemeById" parameterType="long" resultMap="ThemeInfoMap">
+		SELECT a.ID,a.DesignerId,b.DesignerName,a.ThemeName,a.Described,a.Picture,a.IsEnable FROM dn_theme a 
+			LEFT JOIN dn_designer b ON a.DesignerId = b.ID 
+			where a.ID = #{themeId,jdbcType=BIGINT}
+	</select>
+</mapper> 
